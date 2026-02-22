@@ -5,6 +5,7 @@
             --surface: #1e1e1e;
             --text: #ffffff;
             --text-link: #bb86fc;
+            --text-link-Hover: #fc5089;
             --border: #333;
         }
 
@@ -110,14 +111,21 @@
             width: 100%;
             height: 100%;
             display: block;
-            font-size: 0.7rem;
+            font-size: 1rem;
             padding: 5px;
-            border: 1px dashed #555;
             flex: 1;
             text-align: center;
         }
 
-        a.tab-placeholder {
+        a {
             color: var(--text-link);
             text-decoration: none;
+            border: 1px dashed #555;
+            transition: 0.7s;
+        }
+
+        a:hover {
+            color: var(--text-link-Hover);
+            border: 1px dashed var(--text-link-Hover);
+            box-shadow: 0 0 5px var(--text-link-Hover);
         }
