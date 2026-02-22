@@ -92,3 +92,47 @@ function calcularSessao() {
         link.download = `progresso_${personagem.nome}.txt`;
         link.click();
     }
+
+    function importarDados() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert("Por favor, selecione um arquivo .txt primeiro!");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const conteudo = e.target.result;
+
+        try {
+            // Usando Regex para capturar os valores após os dois pontos
+            const nomeMatch = conteudo.match(/Nome:\s*(.*)/);
+            const nivelMatch = conteudo.match(/Nível Atual:\s*(\d+)/);
+            const xpMatch = conteudo.match(/XP Acumulada:\s*(\d+)/);
+
+            if (nivelMatch && xpMatch) {
+                // Atualiza o objeto personagem
+                personagem.nome = nomeMatch ? nomeMatch[1].trim() : "Aventureiro";
+                personagem.nivel = parseInt(nivelMatch[1]);
+                personagem.xp = parseInt(xpMatch[1]);
+
+                // Atualiza os campos de input e a interface
+                document.getElementById('charName').value = personagem.nome;
+                atualizarInterface();
+
+                document.getElementById('log').innerText = "✅ Personagem carregado com sucesso!";
+                document.getElementById('log').style.color = "var(--secondary)";
+            } else {
+                throw new Error("Formato de arquivo inválido.");
+            }
+        } catch (error) {
+            alert("Erro ao ler o arquivo. Certifique-se de que é o arquivo .txt gerado pelo sistema.");
+            console.error(error);
+        }
+    };
+
+    reader.readAsText(file);
+}

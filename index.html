@@ -35,7 +35,7 @@
   
       <div class="input-group">
           <label>XP de Inimigos (Ranks separados por vírgula)</label>
-          <input type="text" id="inimigosRanks" placeholder="Ex: D, C, B, A, S, SS">
+          <input type="text" id="inimigosRanks" placeholder="Ex: n,rank + n2,rank2 | 2,D + 3,C">
       </div>
   
       <div class="grid-ranks">
@@ -69,6 +69,11 @@
   
       <button class="btn-calc" onclick="calcularSessao()">Calcular Progresso</button>
       <button class="btn-export" onclick="exportarDados()">Exportar .TXT</button>
+      <div class="input-group" style="margin-top: 20px; border: 1px dashed var(--secondary); padding: 10px; border-radius: 8px;">
+        <label>Importar Personagem (.txt)</label>
+        <input type="file" id="fileInput" accept=".txt" style="font-size: 0.8rem;">
+        <button class="btn-export" onclick="importarDados()" style="margin-top: 5px;">Carregar Arquivo</button>
+      </div>
   
       <div id="log"></div>
   </div>
