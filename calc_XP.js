@@ -1,5 +1,6 @@
     // Configurações do Sistema
     const TABELA_XP = { 'D': 10, 'C': 45, 'B': 80, 'A': 125, 'S': 180, 'SS': 225 };
+    const TABELA_DUNGEON = { 'D': 1.2, 'C': 1.4, 'B': 1.6, 'A': 1.8, 'S': 2, 'SS': 3 };
     const MULT_GRUPO = { 1: 1, 2: 1.3, 3: 1.5, 4: 1.75 };
 
     // Estado do Personagem
@@ -50,7 +51,7 @@ function calcularSessao() {
     // ------------------------------------------------
 
     // 2. Dungeon
-    if (dungeonRank) ganhoBase += TABELA_XP[dungeonRank];
+    if (dungeonRank) ganhoBase *= TABELA_DUNGEON[dungeonRank];
 
     // 3. Multiplicador de Grupo
     let xpFinal = ganhoBase * MULT_GRUPO[qtdGrupo];
