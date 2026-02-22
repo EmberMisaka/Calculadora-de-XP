@@ -1,169 +1,80 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Calculadora de XP RPG</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; text-align: center ;}
-
-    h1 { color: #4CAF50; }
-
-    h2 { margin-top: 25px; }
-
-    label { display: block; margin-top: 10px; }
-
-    input, select { margin-top: 5px; padding: 5px; }
-
-    button { margin-top: 15px; padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; }
-    
-    button:hover { background: #45a049; }
-
-    .resultado { margin-top: 20px; padding: 10px; border: 1px solid #ccc; background: #f9f9f9; }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de XP - RPG</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Calculadora de Experiência</h1>
 
-  <div>
-      <h2>Parâmetros iniciais</h2>
-      <label for="nivelAtual">Nível atual:</label>
-      <input type="number" id="nivelAtual" value="1" min="1">
+  <header>
+        <div class="future-tabs">
+          <a class="tab-placeholder" href="index.html">XP</a>
+          <a class="tab-placeholder" href="#">Inventário</a>
+          <a class="tab-placeholder" href="#">Profissões</a>
+          <a class="tab-placeholder" href="#">Habilidades</a>
+          <a class="tab-placeholder" href="#">Status</a>
+    </div>
+  </header>
+<main>
+  <div class="container">
+      <h2>Painel do Aventureiro</h2>
       
-      <label for="xpAtual">XP atual:</label>
-      <input type="number" id="xpAtual" value="0" min="0">
-    </div>
+      <div class="status-card">
+          <div class="input-group">
+              <label>Nome do Personagem</label>
+              <input type="text" id="charName" placeholder="Ex: Arion, o Mago" value="Aventureiro">
+          </div>
+          <p><strong>Nível:</strong> <span id="displayNivel">0</span></p>
+          <p><strong>XP Total:</strong> <span id="displayXP">0</span></p>
+          <p><strong>Falta para o Próximo:</strong> <span id="displayFalta">25</span></p>
+      </div>
+  
+      <hr style="border: 0.5px solid #333; margin: 20px 0;">
+  
+      <div class="input-group">
+          <label>XP de Inimigos (Ranks separados por vírgula)</label>
+          <input type="text" id="inimigosRanks" placeholder="Ex: D, C, B, A, S, SS">
+      </div>
+  
+      <div class="grid-ranks">
+          <div class="input-group">
+              <label>Conclusão de Dungeon</label>
+              <select id="dungeonRank">
+                  <option value="">Nenhuma</option>
+                  <option value="D">Rank D</option>
+                  <option value="C">Rank C</option>
+                  <option value="B">Rank B</option>
+                  <option value="A">Rank A</option>
+                  <option value="S">Rank S</option>
+                  <option value="SS">Rank SS</option>
+              </select>
+          </div>
+          <div class="input-group">
+              <label>Jogadores no Grupo</label>
+              <select id="qtdGrupo">
+                  <option value="1">Solo</option>
+                  <option value="2">2 Pessoas (+30%)</option>
+                  <option value="3">3 Pessoas (+50%)</option>
+                  <option value="4">4+ Pessoas (+75%)</option>
+              </select>
+          </div>
+      </div>
+  
+      <div class="input-group">
+          <label>Pedras Mágicas Consumidas (Máx 5)</label>
+          <input type="number" id="pedrasMagicas" min="0" max="5" value="0">
+      </div>
+  
+      <button class="btn-calc" onclick="calcularSessao()">Calcular Progresso</button>
+      <button class="btn-export" onclick="exportarDados()">Exportar .TXT</button>
+  
+      <div id="log"></div>
+  </div>
+</main>
 
-    <div>
+<script src="calc_XP.js"></script>
 
-        <h2>Progressão</h2>
-        <label for="inimigos">Inimigos abatidos:</label>
-        <input type="number" id="inimigos" value="0" min="0">
-        
-        <label for="rankInimigo">Rank dos inimigos:</label>
-        <select id="rankInimigo">
-            <option value="D" selected>D</option>
-            <option value="C">C</option>
-            <option value="B">B</option>
-            <option value="A">A</option>
-            <option value="S">S</option>
-            <option value="SS">SS</option>
-        </select>
-        
-        <label for="rankDungeon">Rank da Dungeon:</label>
-        <select id="rankDungeon">
-            <option value="D" selected>D</option>
-            <option value="C">C</option>
-            <option value="B">B</option>
-            <option value="A">A</option>
-            <option value="S">S</option>
-            <option value="SS">SS</option>
-        </select>
-        
-        <label for="grupo">Qtd grupo de aventura:</label>
-        <input type="number" id="grupo" value="0" min="1">
-        
-        <label for="mvp">MVP:</label>
-        <select id="mvp">
-            <option value="false">Não</option>
-            <option value="true">Sim</option>
-        </select>
-        
-    </div>
-  <button onclick="calcularXP()">Calcular</button>
-
-  <div class="resultado" id="resultado"></div>
-
-  <script>
-    // Tabelas e funções auxiliares
-    const XP_INIMIGO = { D: 10, C: 45, B: 80, A: 125, S: 180, SS: 225 };
-    const M_DUNGEON = { D: 1.1, C: 1.2, B: 1.3, A: 1.4, S: 1.5, SS: 2.0 };
-    const M_GRUPO = { 2: 1.03, 3: 1.05, 4: 1.07, 5: 1.10, 6: 1.15, 7: 1.20, 8: 1.30 };
-
-    function multGrupo(n) {
-      if (n >= 9) return 1.50;
-      if (n <= 1) return 1.0;
-      return M_GRUPO[n];
-    }
-
-    // XP necessário para atingir o nível n
-    function xpPorNivel(n, k = 20) {
-      return k * (n ** 2);
-    }
-
-    // XP acumulado até o nível n
-    function xpTotalParaNivel(n, k = 20) {
-      return Math.floor(k * (n * (n + 1) * (2 * n + 1) / 6));
-    }
-
-    // Qual nível o personagem está dado o XP acumulado
-    function nivelAtualPorXP(xp, k = 20) {
-      let nivel = 0;
-      while (xpTotalParaNivel(nivel + 1, k) <= xp) {
-        nivel++;
-      }
-      return nivel;
-    }
-
-function calcularXP() {
-  const nivelInicial = parseInt(document.getElementById("nivelAtual").value);
-  const xpInicial = parseInt(document.getElementById("xpAtual").value);
-  const inimigos = parseInt(document.getElementById("inimigos").value);
-  const rankInimigo = document.getElementById("rankInimigo").value;
-  const rankDungeon = document.getElementById("rankDungeon").value;
-  const grupo = parseInt(document.getElementById("grupo").value);
-  const mvp = document.getElementById("mvp").value === "true";
-
-  // XP máximo permitido para o nível atual
-  const xpMaxNivel = xpTotalParaNivel(nivelInicial) - 1;
-
-  // Validação: XP atual não pode ser maior que o limite do nível
-  if (xpInicial > xpMaxNivel) {
-    document.getElementById("resultado").innerHTML = `
-      <span style="color:red"><strong>Erro:</strong> O XP informado (${xpInicial}) é maior do que o permitido para o nível ${nivelInicial} (máximo ${xpMaxNivel}).</span>
-    `;
-    return; // interrompe o cálculo
-  }
-
-  // XP ganho na run
-  const xpBase = inimigos * XP_INIMIGO[rankInimigo];
-  const md = M_DUNGEON[rankDungeon];
-  const mg = multGrupo(grupo);
-  const mmvp = mvp ? 2.0 : 1.0;
-  const xpRun = Math.round(xpBase * md * mg * mmvp);
-
-  // XP total acumulado
-  const xpTotal = xpInicial + xpRun;
-
-  // Determinar nível final com base no XP acumulado
-  const nivelFinal = nivelAtualPorXP(xpTotal);
-
-  // XP necessário para próximo nível
-  const xpProximo = xpTotalParaNivel(nivelFinal + 1);
-  const falta = xpProximo - xpTotal;
-
-  // Verificar quantos níveis foram ganhos
-  const niveisGanhos = nivelFinal - nivelInicial;
-
-  let resultadoTexto = `
-    <strong>Resultados:</strong><br>
-    XP ganho na run: ${xpRun}<br>
-    XP total acumulado: ${xpTotal}<br>
-    Nível atual: ${nivelFinal +1}<br> 
-    XP necessário para nível ${nivelFinal + 2}: ${xpProximo}<br>
-    Falta ${falta} XP para o próximo nível.<br>
-  `;
-
-  if (niveisGanhos > 0) {
-    if (niveisGanhos === 1) {
-      resultadoTexto += `<span style="color:green;">🎉 Parabéns! Você subiu para o nível ${nivelFinal+1}!</span>`;
-    } else {
-      resultadoTexto += `<span style="color:orange">🔥 Incrível! Você subiu ${niveisGanhos+1} níveis de uma vez, agora está no nível ${nivelFinal+1}!</span>`;
-    }
-  }
-
-  document.getElementById("resultado").innerHTML = resultadoTexto;
-}
-  </script>
 </body>
 </html>
