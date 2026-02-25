@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Ficha - Sistema Youkai</title>
+    <link rel="stylesheet" href="../CSS/styles.css">
+</head>
+<body>
+<header>
+    <nav class="future-tabs">
+        <a class="tab-button" href="index.html">XP Avulso</a>
+        <a class="tab-button active" href="char.html">Personagem</a>
+        <a class="tab-button" href="#">Profissões</a>
+    </nav>
+</header>
+
+<main>
+    <div class="container">
+        <h2>Ficha de Personagem</h2>
+
+        <div class="status-card">
+            <h3>1. Identidade</h3>
+            <div class="input-group">
+                <label>Nome do Personagem</label>
+                <input type="text" id="charName" placeholder="Ex: Akuma-kun">
+            </div>
+            <div class="grid-ranks">
+                <div class="input-group">
+                    <label>Raça</label>
+                    <select id="charRace"></select> </div>
+                <div class="input-group">
+                    <label>Classe</label>
+                    <select id="charClass"></select> </div>
+            </div>
+            <div class="grid-ranks">
+                <div class="input-group">
+                    <label>Nível Personagem</label>
+                    <input type="number" id="charLevel" value="1">
+                </div>
+                <div class="input-group">
+                    <label>Nível Classe</label>
+                    <input type="number" id="classLevel" value="1">
+                </div>
+            </div>
+        </div>
+
+        <div class="status-card" id="card-habilidades" style="border-left-color: var(--primary);">
+            <h3>2. Habilidades de Classe</h3>
+            <div id="habilidades-opcoes" class="grid-ranks" style="grid-template-columns: 1fr;">
+                </div>
+        </div>
+
+        <h3>3. Atributos</h3>
+        <div class="status-card" style="border-left-color: var(--primary);">
+            <div class="grid-ranks">
+                <div class="input-group"><label>Vida Atual</label><input type="number" id="hpAtual"></div>
+                <div class="input-group"><label>Vida Máx</label><div class="fixed-val" id="hpMax">0</div></div>
+            </div>
+            <div class="grid-ranks">
+                <div class="input-group"><label>FOR</label><input type="number" id="stat_for"></div>
+                <div class="input-group"><label>DES</label><input type="number" id="stat_des"></div>
+            </div>
+            <div class="grid-ranks">
+                <div class="input-group"><label>RM</label><input type="number" id="stat_rm"></div>
+                <div class="input-group"><label>RF</label><input type="number" id="stat_rf"></div>
+            </div>
+            <div class="grid-ranks">
+                <div class="input-group"><label>NM</label><input type="number" id="stat_nm"></div>
+                <div class="input-group"><label>RC</label><input type="number" id="stat_rc"></div>
+            </div>
+            <div class="input-group"><label>Sanidade</label><div class="fixed-val" id="sanidade">0</div></div>
+        </div>
+
+        <h3>4. Resumo e Passivas</h3>
+        <textarea id="habilidades" placeholder="Passivas automáticas aparecerão aqui..."></textarea>
+
+        <button class="btn-calc" onclick="document.getElementById('importFile').click()">Importar .txt</button>
+        <input type="file" id="importFile" style="display:none" accept=".txt">
+        <button class="btn-export" onclick="exportarTxt()">Exportar Ficha</button>
+        <div id="log">Aguardando interação...</div>
+    </div>
+</main>
+
+<script src="../JS/char.JS"></script>
+
+</body>
+</html>

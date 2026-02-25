@@ -76,6 +76,7 @@ function calcularSessao() {
         document.getElementById('displayNivel').innerText = personagem.nivel;
         document.getElementById('displayXP').innerText = personagem.xp;
         document.getElementById('displayFalta').innerText = Math.max(0, prox - personagem.xp);
+
     }
 
     function exportarDados() {

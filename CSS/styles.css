@@ -1,0 +1,128 @@
+        :root {
+            --primary: #6200ee;
+            --secondary: #03dac6;
+            --bg: #121212;
+            --bg2: #3d3d3d;
+            --surface: #1e1e1e;
+            --text: #ffffff;
+            --text-link: #bb86fc;
+            --text-link-Hover: #fc5089;
+            --border: #333;
+        }
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        header {
+            width: 100%;
+            background-color: var(--surface);
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: center;
+        }
+
+        .future-tabs {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            height: 60px;
+        }
+
+        .tab-button {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border: none;
+            border-bottom: 3px solid transparent;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .tab-button:hover { color: var(--text-link-Hover); background-color: rgba(252, 80, 137, 0.05); }
+        .tab-button.active { color: var(--secondary); border-bottom: 3px solid var(--secondary); background-color: rgba(3, 218, 198, 0.05); }
+
+        main {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 550px;
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2 { border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 0; font-size: 1.4rem; }
+        h3 { font-size: 0.9rem; color: var(--secondary); text-transform: uppercase; margin-bottom: 15px; }
+
+        .status-card {
+            background: #252525;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.8rem; color: #bbb; }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            background: #2c2c2c;
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 4px;
+            transition: border 0.3s;
+        }
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; }
+
+        textarea { height: 150px; resize: vertical; font-family: inherit; }
+
+        .grid-ranks {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .fixed-val { font-weight: bold; color: var(--text); font-size: 1.1rem; padding: 8px 0; }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .btn-calc { background-color: var(--primary); color: white; }
+        .btn-calc:hover { background-color: #7722ff; }
+
+        .btn-export { background-color: transparent; border: 1px solid var(--secondary); color: var(--secondary); }
+        .btn-export:hover { background-color: var(--secondary); color: black; }
+
+        #log { margin-top: 15px; font-size: 0.85rem; color: var(--secondary); min-height: 1.2em; text-align: center; }
+
+        @media (max-width: 400px) { .tab-button { font-size: 0.75rem; letter-spacing: 0; } }
