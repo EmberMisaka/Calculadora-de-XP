@@ -355,28 +355,34 @@ const db = {
         ],
     }
 };
-
 // Inicializar Seletores
 function init() {
     const rSel = document.getElementById('charRace');
     const cSel = document.getElementById('charClass');
+    const importInput = document.getElementById('importFile');
     
+    // Popular selects com os dados do DB
     Object.keys(db.racas).forEach(r => rSel.add(new Option(r, r)));
     Object.keys(db.classes).forEach(c => cSel.add(new Option(c, c)));
 
+    // Eventos de Mudança
     rSel.addEventListener('change', carregarStatusBase);
     cSel.addEventListener('change', renderHabilidades);
+    importInput.addEventListener('change', importarTxt);
     
-    // Qualquer mudança nos inputs numéricos atualiza o texto final
-    document.querySelectorAll('select, input').forEach(el => {
+    // Ouvinte global para qualquer input que deva atualizar o resumo textual
+    document.querySelectorAll('select, input, textarea').forEach(el => {
         el.addEventListener('change', atualizarTextoFinal);
     });
 
+    // Inicialização do estado da página
     carregarStatusBase();
 }
 
 function carregarStatusBase() {
     const raca = db.racas[document.getElementById('charRace').value];
+    
+    // Atualiza os valores visuais (labels e inputs)
     document.getElementById('hpAtual').innerText = raca.hp;
     document.getElementById('sanidade').innerText = raca.san;
     document.getElementById('stat_for').value = raca.for;
@@ -397,9 +403,9 @@ function renderHabilidades() {
 
     db.classes[classe].forEach(hab => {
         const div = document.createElement('div');
+        div.className = 'class-check';
         div.innerHTML = `<input type="checkbox" class="hab-check" value="${hab}"> ${hab}`;
         div.querySelector('input').addEventListener('change', atualizarTextoFinal);
-        div.classList.add('class-check');
         container.appendChild(div);
     });
     atualizarTextoFinal();
@@ -408,29 +414,97 @@ function renderHabilidades() {
 function atualizarTextoFinal() {
     const racaNome = document.getElementById('charRace').value;
     const classeNome = document.getElementById('charClass').value;
+    const nChar = document.getElementById('charLevel').value;
     const nClasse = document.getElementById('classLevel').value;
     const selecionadas = Array.from(document.querySelectorAll('.hab-check:checked')).map(c => c.value);
 
-    let resumo = `--- PASSIVAS (${racaNome}) ---\n${db.racas[racaNome].passiva}\n\n`;
-    resumo += `--- HABILIDADES (${classeNome} Nív.${nClasse}) ---\n`;
-    resumo += selecionadas.length ? selecionadas.join(' | ') : "Nenhuma selecionada.";
+    let resumo = `--- FICHA TÉCNICA (Nível ${nChar}) ---\n`;
+    resumo += `Raça: ${racaNome}\n`;
+    resumo += `Passivas de Raça:\n${db.racas[racaNome].passiva}\n\n`;
+    resumo += `--- HABILIDADES DE CLASSE (${classeNome} Nível ${nClasse}) ---\n`;
+    resumo += selecionadas.length ? selecionadas.join('\n') : "Nenhuma habilidade selecionada.";
     
     document.getElementById('habilidades').value = resumo;
 }
 
-// Exportação/Importação mantêm a lógica anterior, mas agora salvam o ClassLevel
 function exportarTxt() {
-    const nome = document.getElementById('charName').value || "Ficha";
-    let txt = `Nome: ${nome}\nRaça: ${document.getElementById('charRace').value}\n`;
-    txt += `Classe: ${document.getElementById('charClass').value}\nNível Classe: ${document.getElementById('classLevel').value}\n`;
-    txt += `FOR: ${document.getElementById('stat_for').value}\nDES: ${document.getElementById('stat_des').value}\n`;
-    txt += `--- HABILIDADES ---\n${document.getElementById('habilidades').value}`;
+    const nome = document.getElementById('charName').value || "Ficha_Sem_Nome";
+    
+    // Criamos um formato de "Dicionário" (Chave: Valor) para facilitar a importação depois
+    let txt = `[DADOS DO PERSONAGEM]\n`;
+    txt += `Nome: ${nome}\n`;
+    txt += `Raça: ${document.getElementById('charRace').value}\n`;
+    txt += `Classe: ${document.getElementById('charClass').value}\n`;
+    txt += `Nível_Personagem: ${document.getElementById('charLevel').value}\n`;
+    txt += `Nível_Classe: ${document.getElementById('classLevel').value}\n`;
+    txt += `FOR: ${document.getElementById('stat_for').value}\n`;
+    txt += `DES: ${document.getElementById('stat_des').value}\n`;
+    txt += `RM: ${document.getElementById('stat_rm').value}\n`;
+    txt += `RF: ${document.getElementById('stat_rf').value}\n`;
+    txt += `NM: ${document.getElementById('stat_nm').value}\n`;
+    txt += `RC: ${document.getElementById('stat_rc').value}\n`;
+    txt += `Regen: ${document.getElementById('stat_regen').value}\n`;
+    txt += `\n[RESUMO E NOTAS]\n`;
+    txt += document.getElementById('habilidades').value;
 
     const blob = new Blob([txt], {type: 'text/plain'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = nome + ".txt";
+    a.download = nome.replace(/\s/g, '_') + ".txt";
     a.click();
+}
+
+function importarTxt(event) {
+    const arquivo = event.target.files[0];
+    if (!arquivo) return;
+
+    const leitor = new FileReader();
+    leitor.onload = function(e) {
+        const conteudo = e.target.result;
+        const linhas = conteudo.split('\n');
+        const dados = {};
+
+        // Mapeia o arquivo linha por linha
+        linhas.forEach(linha => {
+            if (linha.includes(':')) {
+                const [chave, valor] = linha.split(':');
+                dados[chave.trim()] = valor.trim();
+            }
+        });
+
+        // Aplica os valores nos campos do HTML
+        if (dados['Nome']) document.getElementById('charName').value = dados['Nome'];
+        if (dados['Nível_Personagem']) document.getElementById('charLevel').value = dados['Nível_Personagem'];
+        if (dados['Nível_Classe']) document.getElementById('classLevel').value = dados['Nível_Classe'];
+        
+        // Seleciona Raça e Classe primeiro (pois elas resetam os campos)
+        if (dados['Raça']) {
+            document.getElementById('charRace').value = dados['Raça'];
+            carregarStatusBase(); 
+        }
+        if (dados['Classe']) {
+            document.getElementById('charClass').value = dados['Classe'];
+            renderHabilidades();
+        }
+
+        // Sobrescreve os status com os valores do arquivo (os valores que o jogador upou)
+        if (dados['FOR']) document.getElementById('stat_for').value = dados['FOR'];
+        if (dados['DES']) document.getElementById('stat_des').value = dados['DES'];
+        if (dados['RM']) document.getElementById('stat_rm').value = dados['RM'];
+        if (dados['RF']) document.getElementById('stat_rf').value = dados['RF'];
+        if (dados['NM']) document.getElementById('stat_nm').value = dados['NM'];
+        if (dados['RC']) document.getElementById('stat_rc').value = dados['RC'];
+        if (dados['Regen']) document.getElementById('stat_regen').value = dados['Regen'];
+
+        // Recupera o texto de habilidades/notas
+        const indexNotas = conteudo.indexOf('[RESUMO E NOTAS]');
+        if (indexNotas !== -1) {
+            document.getElementById('habilidades').value = conteudo.substring(indexNotas + 17).trim();
+        }
+
+        alert("Ficha carregada com sucesso!");
+    };
+    leitor.readAsText(arquivo);
 }
 
 window.onload = init;
