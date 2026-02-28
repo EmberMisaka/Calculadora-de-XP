@@ -47,15 +47,20 @@
 
         <div class="status-card" id="card-habilidades" style="border-left-color: var(--primary);">
             <h3>2. Habilidades de Classe</h3>
-            <div id="habilidades-opcoes" class="grid-ranks" style="grid-template-columns: 1fr;">
-                </div>
+            <div id="habilidades-opcoes" class="grid-ranks" style="grid-template-columns: 1fr 1fr;"></div>
         </div>
 
         <h3>3. Atributos</h3>
         <div class="status-card" style="border-left-color: var(--primary);">
             <div class="grid-ranks">
-                <div class="input-group"><label>Vida Atual</label><input type="number" id="hpAtual"></div>
-                <div class="input-group"><label>Vida Máx</label><div class="fixed-val" id="hpMax">0</div></div>
+                <div class="input-group">
+                    <label>Vida Atual</label>
+                    <div class="fixed-val" id="hpAtual">0</div>
+                </div>
+                <div class="input-group">
+                    <label>Sanidade</label>
+                    <div class="fixed-val" id="sanidade">0</div>
+                </div>
             </div>
             <div class="grid-ranks">
                 <div class="input-group"><label>FOR</label><input type="number" id="stat_for"></div>
@@ -69,7 +74,13 @@
                 <div class="input-group"><label>NM</label><input type="number" id="stat_nm"></div>
                 <div class="input-group"><label>RC</label><input type="number" id="stat_rc"></div>
             </div>
-            <div class="input-group"><label>Sanidade</label><div class="fixed-val" id="sanidade">0</div></div>
+            <div class="grid-ranks">
+                <div class="input-group">
+                    <label>Regen</label>
+                    <input type="number" id="stat_regen">
+                </label>
+                </div>
+            </div>
         </div>
 
         <h3>4. Resumo e Passivas</h3>
@@ -78,21 +89,270 @@
         <button class="btn-calc" onclick="document.getElementById('importFile').click()">Importar .txt</button>
         <input type="file" id="importFile" style="display:none" accept=".txt">
         <button class="btn-export" onclick="exportarTxt()">Exportar Ficha</button>
-        <div id="log">Aguardando interação...</div>
     </div>
 </main>
 
 <script>
 const db = {
     racas: {
-        "Humano": { hp: 100, san: 100, for: 2, des: 1, rm: 1, rf: 1, nm: 5, rc: 3, passiva: "Versatilidade: Começa com NM e RC altos." },
-        "Youkai": { hp: 150, san: 60, for: 4, des: 4, rm: 1, rf: 1, nm: 0, rc: 0, passiva: "Demon Sanity: Buffs quando sanidade está baixa." },
-        "Morto-Vivo": { hp: 70, san: 51, for: 7, des: 0, rm: 2, rf: 2, nm: 0, rc: 0, passiva: "Imortalidade: Ganha status devorando corpos." }
+        "Humano": { hp: 100,
+                    san: 100,
+
+                    // Status Físicos
+                    for: 2,
+                    rm: 1,
+                    rf: 1,
+                    des: 1,
+                    regen: 0,
+
+                    // Status Mágicos
+                    nm: 5,
+                    rc: 3,
+                    passiva:
+                    " - Passiva: [Smart Lecture] - Pode aprender magia através de grimórios e ensinamentos de outras pessoas. \n"+
+                    "\n - Passiva: [Emotional Trigger] - Em situações de perigo (inclui combate direto e quando consegue perceber ataques furtivos), sua destreza aumenta em +3(+nível do personagem X 1.2) instantaneamente."
+        },
+        "Elfo": { hp: 120,
+                san: 100,
+
+                // Status Físicos
+                for: 3,
+                rm: 3,
+                rf: 2,
+                des: 1,
+                regen: 0,
+
+                // Status Mágicos
+                nm: 1,
+                rc: 0,
+                passiva:
+                "- Passiva: [Forest Friendly] - Consegue se comunicar com animais e plantas. \n"+
+                "\n - Passiva: [Visão Mágica] - Permite ver inimigos atrás de objetos em até 2km de distância. \n"+
+                "\n - Linguagem: Sabem a língua humana e élfica."
+        },
+        "Vastaya": { hp:90,
+                    san: 110,
+
+                    // Status Físicos
+                    for: 2,
+                    rm: 1,
+                    rf: 1,
+                    des: 4,
+                    regen: 2,
+
+                    // Status Mágicos
+                    nm: 1,
+                    rc: 0,
+                    passiva:
+                    "- Digite as passivas manualmente \n"
+        },
+        "Draconiano": { hp:190,
+                    san: 85,
+
+                    // Status Físicos
+                    for: 4,
+                    rm: 2,
+                    rf: 2,
+                    des: 1,
+                    regen: 0,
+
+                    // Status Mágicos
+                    nm: 0,
+                    rc: 0,
+                    passiva:
+                    "- Ativa: [Fúria do Dragão] - Seu próximo ataque direto causa o dobro de dano (Cooldown de 3 turnos). \n"+
+                    "\n - Passiva: [Vontade Dracônica] - Quando o Daconiano estiver lutando sozinho, recebe: \n +3 de FOR (+nível do personagem) \n +5 de RM (+nível do personagem)\n +5 de RF(+nível do personagem)\n"
+        },
+        "Fada": { 
+                    hp: 40,
+                    san: 200,
+
+                    // Status Físicos
+                    for: 0,
+                    rm: 0,
+                    rf: 0,
+                    des: 10,
+                    regen: 0,
+
+                    // Status Mágicos
+                    nm: 3,
+                    rc: 2,
+                    passiva:
+                    "- Passiva: [Flight] - Permite o vôo por tempo indeterminado em alturas não específicas (a fada só não pode sair do planeta).\n"+
+                    "\n - Passiva: [Fairy's Dust] - Enquanto estiver voando, emite um pó com propriedades curativas (cura 1% da vida máxima por turno ou 5% por minuto fora de combate, aplicável em si mesmo).\n"
+        },
+        "Youkai": { 
+                    hp: 150,
+                    san: 60,
+
+                    // Status Físicos
+                    for: 4,
+                    rm: 1,
+                    rf: 1,
+                    des: 4,
+                    regen: 0,
+
+                    // Status Mágicos
+                    nm: 0,
+                    rc: 0,
+                    passiva:
+                    "- Passiva: [Demon Sanity] - Quando a sanidade abaixar em menos de 50 pontos, você se torna exaltado, ganhando:\n+2 de FOR (+nível do personagem);\n+5 de RM (+nível do personagem);\n+ 5 de RC (+nível do personagem);\n"+
+                    "\n - Passiva: [Demon Fury] - Enquanto em batalha, caso não desfira golpes, regenera +2(+ nível do personagem) de vida por turno;  \n"
+        },
+
+        "Meio Deus": { 
+                    hp: 55,
+                    san: 200,
+
+                    // Status Físicos
+                    for: 4,
+                    rm: 4,
+                    rf: 4,
+                    des: 4,
+                    regen: 2,
+
+                    // Status Mágicos
+                    nm: 2,
+                    rc: 2,
+                    passiva:
+                    "- Passiva: [Divine Memory] - Só pode usar o elemento [Celestial] em magias.\n"+
+                    "\n - Passiva: [Divine Essence] - Toda arma que você tocar será restaurada (concertada) e desferirá +10 de dano(+nível do personagem).\n"+
+                    "\n - Passiva: [Divine Body] - É imune a qualquer tipo de maldição."
+        },
+        "Meio Demônio": { 
+                    hp: 200,
+                    san: 55,
+
+                    // Status Físicos
+                    for: 4,
+                    rm: 4,
+                    rf: 4,
+                    des: 4,
+                    regen: 2,
+
+                    // Status Mágicos
+                    nm: 2,
+                    rc: 2,
+                    passiva:
+                    "- Passiva: [Demon Memory] - Só pode usar o elemento [Arcano] em magias.\n"+
+                    "\n - Passiva: [Demon Essence] - Todo golpe recebido, será dissipado 1d15 de dano (+nível do personagem).\n"+
+                    "\n - Passiva: [Demon Body] - É imune a qualquer tipo de maldição. "
+        },
+        "Morto Vivo": { 
+                    hp: 70,
+                    san: 51,
+
+                    // Status Físicos
+                    for: 7,
+                    rm: 2,
+                    rf: 2,
+                    des: 0,
+                    regen: 10,
+
+                    // Status Mágicos
+                    nm: 0,
+                    rc: 0,
+                    passiva:
+                    "- Passiva: [Meat Life Gain] - Ao consumir carne de outros seres vivos, regenera vida em +120 por corpo.\n"+
+                    "\n - Passiva: [Meat Stats Gain] - Ao consumir um corpo, você ganha +5 em FOR, RM, RF e DES permanentemente, mas você não recebe pontos de nenhum outro método.\n"+
+                    "\n - Maldição: [Withedered Revive] - Caso seja revivido, todo status a mais adquirido será reduzido em 20% (arredonde números quebrados para cima)"
+        },
+        "Tritão": { 
+                    hp: 120,
+                    san: 90,
+
+                    // Status Físicos
+                    for: 1,
+                    rm: 1,
+                    rf: 1,
+                    des: 2,
+                    regen: 0,
+
+                    // Status Mágicos
+                    nm: 5,
+                    rc: 0,
+                    passiva:
+                    "- Passiva: [Fishy Body] - Podem assumir uma forma semelhante a de um peixe, criando barbatanas e uma cauda de peixe, respirando de baixo d'água.\n"+
+                    "\n - Passiva: [Squishy Fishy] - Enquanto na água, ganham +7 de DES e FOR (+nível do personagem X 1.2). \n"
+        },
+
     },
     classes: {
-        "Guerreiro": ["Investida", "Bloqueio", "Fúria"],
-        "Mago": ["Seta Arcana", "Escudo Mágico", "Meditação"],
-        "Ladino": ["Furtividade", "Punhalada", "Veneno"]
+        "Guerreiro": [
+            "Força Ascendente", 
+            "Resistência Ascendente", 
+            "Corpo Condutor", 
+            "Corpo Forte", 
+            "Golpe Estridente", 
+            "Corpo Mais Forte", 
+            "Ativa: Combatente Experiente", 
+            "Body Builder", 
+            "Ampliação Furiosa", 
+            "Ampliação Maníaca"
+        ],
+        "Mago": [
+            "Restoration Grantee", 
+            "No Stick Needed", 
+            "Elemental Knowledge", 
+            "Shield Adiction", 
+            "Perfect Aim", 
+            "Magic Mirror", 
+            "Arch Mage", 
+            "Arch Healer", 
+            "The World Beyond", 
+            "The Magic Beyond"
+        ],
+        
+        "Feiticeiro": [
+            "Dark Change", 
+            "Light Change", 
+            "Dark Control", 
+            "Mind Control", 
+            "Witch Experience", 
+            "Dark Influence", 
+            "Necromancer", 
+            "Dark Mage", 
+            "Litch", 
+            "Arch Dark Mage"
+        ],
+
+        "Arqueiro": [
+            "Arrow Mutation", 
+            "Fleetching Expertise", 
+            "Critical Deley", 
+            "Argon Scope", 
+            "Metal Auger", 
+            "Shock Arrow", 
+            "Invisible Sniper", 
+            "Smite Alive", 
+            "Arrow of Dammed", 
+            "True Arrow"
+        ],
+
+        "Ladino": [
+            "Instinto Assassino", 
+            "Destreza Crescente", 
+            "Sangramento Feroz", 
+            "Envenenamento Feroz", 
+            "Capa da Morte", 
+            "Piedade da Morte", 
+            "Presença Avassaladora", 
+            "Ladrão de Vidas", 
+            "Anjo da Morte", 
+            "Fantasma Sangrento"
+        ],
+        "Clérigo": [
+            "Self Buffering", 
+            "Other Debuffering", 
+            "Undead Bounty", 
+            "Strength Elevation", 
+            "Purification Variable", 
+            "Degradation Variable", 
+            "Ponto de Ruptura", 
+            "Vida ou Morte", 
+            "Legends Never Die", 
+            "The Devil Will Not Win..."
+        ],
     }
 };
 
@@ -108,7 +368,7 @@ function init() {
     cSel.addEventListener('change', renderHabilidades);
     
     // Qualquer mudança nos inputs numéricos atualiza o texto final
-    document.querySelectorAll('input, select').forEach(el => {
+    document.querySelectorAll('select, input').forEach(el => {
         el.addEventListener('change', atualizarTextoFinal);
     });
 
@@ -117,8 +377,7 @@ function init() {
 
 function carregarStatusBase() {
     const raca = db.racas[document.getElementById('charRace').value];
-    document.getElementById('hpMax').innerText = raca.hp;
-    document.getElementById('hpAtual').value = raca.hp;
+    document.getElementById('hpAtual').innerText = raca.hp;
     document.getElementById('sanidade').innerText = raca.san;
     document.getElementById('stat_for').value = raca.for;
     document.getElementById('stat_des').value = raca.des;
@@ -126,6 +385,7 @@ function carregarStatusBase() {
     document.getElementById('stat_rf').value = raca.rf;
     document.getElementById('stat_nm').value = raca.nm;
     document.getElementById('stat_rc').value = raca.rc;
+    document.getElementById('stat_regen').value = raca.regen;
     
     renderHabilidades();
 }
@@ -139,6 +399,7 @@ function renderHabilidades() {
         const div = document.createElement('div');
         div.innerHTML = `<input type="checkbox" class="hab-check" value="${hab}"> ${hab}`;
         div.querySelector('input').addEventListener('change', atualizarTextoFinal);
+        div.classList.add('class-check');
         container.appendChild(div);
     });
     atualizarTextoFinal();

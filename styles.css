@@ -103,6 +103,14 @@
             margin-bottom: 15px;
         }
 
+        .class-check{
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            border: var(--border) 1px solid;
+            border-radius: 14px;
+        }
+
         .fixed-val { font-weight: bold; color: var(--text); font-size: 1.1rem; padding: 8px 0; }
 
         button {
